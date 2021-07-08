@@ -128,3 +128,4 @@ class gameFrame:
 #newGame = game()
 
 print(chanceDeath(100))
+print("Test GIT")
