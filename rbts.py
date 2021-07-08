@@ -1,6 +1,6 @@
 from os import listdir
 from time import sleep
-from random import choice
+from random import choice, uniform
 
 WINDOW_BOUNDS = {"tl":[0,0],"br":[500,500]}
 COLORS = ["Blue", "Red", "Green", "White", "Black", "Orange", "Yellow"]
@@ -25,10 +25,14 @@ class RBT:
 		return self.color
 
 	def checkDeath(self):
-		return
+		randomVar = uniform(0,1)
+		if(randomVar<chanceDeath(self.age)):
+			self.kill()
+		print(randomVar,chanceDeath(self.age),self.age)
 
 	def tick(self):
 		self.age += 1
+		self.checkDeath()
 
 
 	def move(self):
@@ -119,13 +123,11 @@ class gameFrame:
 
 #newGameFrame = gameFrame()
 
-#newRbt = RBT()
+newRbt = RBT()
 
-#newRbt.getColor()
 #newRbt.move()
 #print(newRbt.getPos())
-
+while hasattr(newRbt,'age'):
+	newRbt.tick()
+	newRbt.kill()
 #newGame = game()
-
-print(chanceDeath(100))
-print("It works")
