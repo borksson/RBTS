@@ -1,9 +1,11 @@
 from os import listdir
 from time import sleep
-from random import choice, uniform
+from random import choice, uniform, randint
+from names import get_first_name
 
 WINDOW_BOUNDS = {"tl":[0,0],"br":[500,500]}
 COLORS = ["Blue", "Red", "Green", "White", "Black", "Orange", "Yellow"]
+CHANCE_BIRTH = 0.1
 
 def chanceDeath(x):
 	return 0.01*pow(1.045,x)
@@ -12,11 +14,13 @@ class RBT:
 	def __init__(self):
 		self.color = choice(COLORS)
 		self.pos = [0,0]
-		self.name = "Bob"
+		self.name = get_first_name()
 		self.age = 0
+		self.deadFLG = False
 		print("A RBT named " + self.name + " was born. It is " + self.color +".")
 
-	def __del__(self): return
+	def __del__(self):
+		print("The RBT named " + self.name + " died.")
 
 	def getPos(self):
 		return self.pos
@@ -27,24 +31,19 @@ class RBT:
 	def checkDeath(self):
 		randomVar = uniform(0,1)
 		if(randomVar<chanceDeath(self.age)):
-			self.kill()
-		print(randomVar,chanceDeath(self.age),self.age)
+			self.deadFLG = True
+		#print(randomVar,chanceDeath(self.age),self.age)
 
 	def tick(self):
 		self.age += 1
 		self.checkDeath()
 
-
 	def move(self):
 		self.pos = [self.pos[0]+1,self.pos[1]+1]
 
-	def kill(self):
-		print("The RBT named " + self.name + " died.")
-		self.__del__()
-
 class game:
 	def __init__(self):
-		self.RBTs = []
+		self.rbts = []
 
 		self.main()
 
@@ -55,11 +54,21 @@ class game:
 		while True:
 			sleep(0.25)
 			print("Running")
+			self.tick()
+
+	def tick(self):
+		if(uniform(0,1)<CHANCE_BIRTH):
 			self.birthRBT()
+		for rbt in self.rbts:
+			rbt.tick()
+			#print(rbt.deadFLG)
+			if rbt.deadFLG == True:
+				self.rbts.remove(rbt)
+				del rbt
 
 	def birthRBT(self):
 		newRBT = RBT()
-		self.RBTs.append(newRBT)
+		self.rbts.append(newRBT)
 
 class gameFrame:
 	def __init__(self):
@@ -123,11 +132,8 @@ class gameFrame:
 
 #newGameFrame = gameFrame()
 
-newRbt = RBT()
+#newRbt = RBT()
 
 #newRbt.move()
 #print(newRbt.getPos())
-while hasattr(newRbt,'age'):
-	newRbt.tick()
-	newRbt.kill()
-#newGame = game()
+newGame = game()
