@@ -2,21 +2,22 @@ from os import listdir
 from time import sleep
 from random import choice, uniform, randint
 from names import get_first_name
-from keyboard import is_pressed
+import json
 
 WINDOW_BOUNDS = {"tl":[0,0],"br":[500,500]}
 COLORS = ["Blue", "Red", "Green", "White", "Black", "Orange", "Yellow"]
-CHANCE_BIRTH = 0.1
+CHANCE_BIRTH = 0.5
 
 def chanceDeath(x):
 	return 0.01*pow(1.045,x)
 
 class RBT:
-	def __init__(self):
-		self.color = choice(COLORS)
-		self.pos = [0,0]
-		self.name = get_first_name()
-		self.age = 0
+	def __init__(self, name, 
+		color, pos = [0,0], age = 0):
+		self.color = color
+		self.pos = pos
+		self.name = name
+		self.age = age
 		self.deadFLG = False
 		print("A RBT named " + self.name + " was born. It is " + self.color +".")
 
@@ -42,10 +43,14 @@ class RBT:
 	def move(self):
 		self.pos = [self.pos[0]+1,self.pos[1]+1]
 
-class game:
-	def __init__(self):
-		self.rbts = []
+	def save(self):
+		return { "name" : self.name, "age" : self.age, 
+							"color": self.color, "pos" : self.pos}
 
+class game:
+	def __init__(self,name,rbts = []):
+		self.rbts = rbts
+		self.name = name
 		self.main()
 
 	def __del__(self):
@@ -56,6 +61,9 @@ class game:
 			sleep(0.25)
 			print("Running")
 			self.tick()
+			if(len(self.rbts) > 2):
+				print(self.save())
+				break
 
 	def tick(self):
 		if(uniform(0,1)<CHANCE_BIRTH):
@@ -68,14 +76,18 @@ class game:
 				del rbt
 
 	def birthRBT(self):
-		newRBT = RBT()
+		newRBT = RBT(name = get_first_name(), 
+		color = choice(COLORS))
 		self.rbts.append(newRBT)
+
+	def save(self):
+		return {"gameName" : self.name, "rbts" : [x.save() for x in self.rbts]}
 
 class gameFrame:
 	def __init__(self):
 		#Load data files
 		self.saves = [ {"name" : x[:-5], "file" : x} for x in listdir("saves")]
-
+		self.game = None
 		#Open menu
 		self.mainMenu()
 
@@ -133,8 +145,9 @@ class gameFrame:
 
 #newGameFrame = gameFrame()
 
-#newRbt = RBT()
+#newRbt = RBT("Steve")
+#print(newRbt.save())
 
 #newRbt.move()
 #print(newRbt.getPos())
-#newGame = game()
+newGame = game("NewGame")
