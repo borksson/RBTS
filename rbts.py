@@ -2,6 +2,7 @@ from os import listdir
 from time import sleep
 from random import choice, uniform, randint
 from names import get_first_name
+from keyboard import is_pressed
 
 WINDOW_BOUNDS = {"tl":[0,0],"br":[500,500]}
 COLORS = ["Blue", "Red", "Green", "White", "Black", "Orange", "Yellow"]
@@ -136,4 +137,4 @@ class gameFrame:
 
 #newRbt.move()
 #print(newRbt.getPos())
-newGame = game()
+#newGame = game()
