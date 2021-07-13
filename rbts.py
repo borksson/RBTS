@@ -86,10 +86,12 @@ class game:
 class gameFrame:
 	def __init__(self):
 		#Load data files
-		self.saves = [ {"name" : x[:-5], "file" : x} for x in listdir("saves")]
+		self.saves = [ {"name" : x[:-5], "file" : "saves\\"+x} for x in listdir("saves")]
 		self.game = None
+
+		self.startSave(self.saves[0]['file'])
 		#Open menu
-		self.mainMenu()
+		#self.mainMenu()
 
 	def __del__(self):
 		#Save and close
@@ -142,12 +144,15 @@ class gameFrame:
 
 	def startSave(self,file):
 		print("Opened "+file)
-
-#newGameFrame = gameFrame()
+		tmpRbts = []
+		with open(file, 'r') as fin:
+			for rbtJson in json.load(fin)['rbts']:
+				print(rbtJson)
+newGameFrame = gameFrame()
 
 #newRbt = RBT("Steve")
 #print(newRbt.save())
 
 #newRbt.move()
 #print(newRbt.getPos())
-newGame = game("NewGame")
+#newGame = game("NewGame")
