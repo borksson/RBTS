@@ -19,10 +19,9 @@ class RBT:
 		self.name = name
 		self.age = age
 		self.deadFLG = False
-		print("A RBT named " + self.name + " was born. It is " + self.color +".")
 
 	def __del__(self):
-		print("The RBT named " + self.name + " died.")
+		return
 
 	def getPos(self):
 		return self.pos
@@ -34,6 +33,7 @@ class RBT:
 		randomVar = uniform(0,1)
 		if(randomVar<chanceDeath(self.age)):
 			self.deadFLG = True
+			print("The RBT named " + self.name + " died.")
 		#print(randomVar,chanceDeath(self.age),self.age)
 
 	def tick(self):
@@ -46,6 +46,9 @@ class RBT:
 	def save(self):
 		return { "name" : self.name, "age" : self.age, 
 							"color": self.color, "pos" : self.pos}
+
+	def print(self):
+		print(self.name,self.age,self.color,self.pos)
 
 class game:
 	def __init__(self,name,rbts = []):
@@ -61,7 +64,7 @@ class game:
 			sleep(0.25)
 			print("Running")
 			self.tick()
-			if(len(self.rbts) > 2):
+			if(len(self.rbts) > 7):
 				print(self.save())
 				break
 
@@ -79,17 +82,25 @@ class game:
 		newRBT = RBT(name = get_first_name(), 
 		color = choice(COLORS))
 		self.rbts.append(newRBT)
+		print("A RBT named " + newRBT.name + " was born. It is " + newRBT.color +".")
 
 	def save(self):
 		return {"gameName" : self.name, "rbts" : [x.save() for x in self.rbts]}
+
+	def print(self):
+		print(self.name)
+		for rbt in self.rbts:
+			rbt.print()
 
 class gameFrame:
 	def __init__(self):
 		#Load data files
 		self.saves = [ {"name" : x[:-5], "file" : "saves\\"+x} for x in listdir("saves")]
+		self.gameSaveFile = self.saves[0]
 		self.game = None
 
-		self.startSave(self.saves[0]['file'])
+		self.mainMenu()
+		self.saveGame()
 		#Open menu
 		#self.mainMenu()
 
@@ -117,7 +128,9 @@ class gameFrame:
 							sel = input("Selection:"+"\n")
 							if sel == "Start":
 								print("\n"+"Start save: "+saveSel)
-								self.startSave([x["file"] for x in self.saves if x["name"]==saveSel][0])
+								self.gameSaveFile = [x for x in self.saves if x["name"]==saveSel][0]
+								print(self.gameSaveFile)
+								self.startSave()
 								break
 							elif sel == "Edit":
 								print("\n"+"Edit save:"+saveSel)
@@ -142,17 +155,24 @@ class gameFrame:
 			else:
 				print("Invalid selection.")
 
-	def startSave(self,file):
-		print("Opened "+file)
+	def startSave(self):
+		print("Opened "+self.gameSaveFile['file'][6:])
 		tmpRbts = []
-		with open(file, 'r') as fin:
-			for rbtJson in json.load(fin)['rbts']:
-				print(rbtJson)
-newGameFrame = gameFrame()
+		with open(self.gameSaveFile['file'], 'r') as fin:
+			fin = json.load(fin)
+			for rbtJson in fin['rbts']:
+				tmpRbt = RBT(rbtJson['name'],rbtJson['color'],rbtJson['pos'],rbtJson['age'])
+				tmpRbts.append(tmpRbt)
+			self.game = game(fin['gameName'],tmpRbts)
 
+	def saveGame(self):
+		with open(self.gameSaveFile['file'], 'w') as fout:
+			fout.write(json.dumps(self.game.save()))
+
+newGameFrame = gameFrame()
+#newGame = game("NewGame")
 #newRbt = RBT("Steve")
 #print(newRbt.save())
 
 #newRbt.move()
 #print(newRbt.getPos())
-#newGame = game("NewGame")
