@@ -1,4 +1,4 @@
-from os import listdir
+from os import listdir, remove
 from time import sleep
 from random import choice, uniform, randint
 from names import get_first_name
@@ -96,47 +96,52 @@ class gameFrame:
 	def __init__(self):
 		#Load data files
 		self.saves = [ {"name" : x[:-5], "file" : "saves\\"+x} for x in listdir("saves")]
-		self.gameSaveFile = self.saves[0]
+		self.gameSaveFile = None
 		self.game = None
 
 		self.mainMenu()
-		self.saveGame()
-		#Open menu
-		#self.mainMenu()
 
 	def __del__(self):
 		#Save and close
-		print("Closed")
+		return
 
 	def mainMenu(self):
 		#if there are no save files, show only the "New game, options, exit" options
 		print("Welcome to RBTS!"+"\n")
 		while True:
+			self.saves = [ {"name" : x[:-5], "file" : "saves\\"+x} for x in listdir("saves")]
 			print("Choose an option:"+"\n")
 			if len(self.saves)>0:
-				print("Resume game")
+				print("Game select")
 			print("New game"+"\n"+"Options"+"\n"+"Exit"+"\n")
 			sel = input("Selection:"+"\n")
-			if sel == "Resume game":
+			if sel == "Game select":
 				while True:
 					print("File select"+"\n")
 					print("\n".join([x["name"] for x in self.saves])+"\n")
 					saveSel = input("File selection:"+"\n")
 					if saveSel in [x["name"] for x in self.saves]:
+						self.gameSaveFile = [x for x in self.saves if x["name"]==saveSel][0]
 						while True:
 							print("Options:"+"\n"+"\n"+"Start"+"\n"+"Edit"+"\n"+"Delete"+"\n"+"Back"+"\n")
 							sel = input("Selection:"+"\n")
 							if sel == "Start":
 								print("\n"+"Start save: "+saveSel)
-								self.gameSaveFile = [x for x in self.saves if x["name"]==saveSel][0]
 								print(self.gameSaveFile)
 								self.startSave()
+								self.saveGame()
 								break
 							elif sel == "Edit":
-								print("\n"+"Edit save:"+saveSel)
+								print("\n"+"Edit save: "+saveSel)
 								break
 							elif sel == "Delete":
-								print("\n"+"Delete save:"+saveSel)
+								print("\n"+"Delete save: "+saveSel)
+								sel = input("Are you sure you want to delete save "+saveSel+"? [Y] or [N]")
+								if sel == "Y":
+									remove(self.gameSaveFile["file"])
+									print("Deleted")
+								else:
+									print("Canceled")
 								break
 							elif sel == "Back":
 								break
@@ -146,7 +151,10 @@ class gameFrame:
 					else:
 						print("Invalid selection.")
 			elif sel == "New game":
-				print("New game")
+				sel = input("New game name: ")
+				self.game = game(sel)
+				self.gameSaveFile = {"name" : sel, "file" : "saves\\"+sel+".json"}
+				self.saveGame()
 			elif sel == "Options":
 				print("Options")
 			elif sel == "Exit":
